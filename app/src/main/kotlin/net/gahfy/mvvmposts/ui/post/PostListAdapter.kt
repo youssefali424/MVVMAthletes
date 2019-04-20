@@ -10,11 +10,11 @@ import net.gahfy.mvvmposts.databinding.ItemPostBinding
 import net.gahfy.mvvmposts.databinding.ItemPostNoimageBinding
 import net.gahfy.mvvmposts.model.Athlete
 
-class PostListAdapter: RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
+class PostListAdapter: RecyclerView.Adapter<PostListAdapter.BaseViewHolder<*>>() {
     private lateinit var postList:List<Athlete>
     lateinit var listener: OnItemClickListener
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostListAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int):  BaseViewHolder<*> {
         setOnItemClickListener(listener)
         val binding: ItemPostBinding
         val bindingNoImage : ItemPostNoimageBinding
@@ -32,11 +32,10 @@ class PostListAdapter: RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
         val comparable = postList[position]
         return if (comparable.image.equals("")) 1 else 2
     }
-    override fun onBindViewHolder(holder: PostListAdapter.ViewHolder, position: Int) {
-        holder.bind(postList[position])
-        holder.binding.rowLayout.setOnClickListener({
-            listener.onClick(it, postList[position])
-        })
+    override fun onBindViewHolder(holder: PostListAdapter. BaseViewHolder<*>, position: Int) {
+        val ele=postList[position]
+        holder.bind(ele,listener)
+
     }
 
     override fun getItemCount(): Int {
@@ -47,9 +46,7 @@ class PostListAdapter: RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
         this.postList = postList
         notifyDataSetChanged()
     }
-    fun addToList(postList:List<Athlete>){
 
-    }
     interface OnItemClickListener {
         fun onClick(view: View, data: Athlete)
     }
@@ -60,22 +57,28 @@ class PostListAdapter: RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
 
     abstract class BaseViewHolder<in T> (itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        abstract fun bind(type: T)
+        abstract fun bind(post: Athlete,listener: OnItemClickListener)
     }
     class ViewHolder( val binding: ItemPostBinding):BaseViewHolder<Athlete>(binding.root){
         private val viewModel = PostViewModel()
 
-        fun bind(post:Athlete){
+        override fun bind(post:Athlete,listener: OnItemClickListener){
             viewModel.bind(post)
             binding.viewModel = viewModel
+            binding.rowLayout.setOnClickListener {
+                listener.onClick(it, post)
+            }
         }
     }
     class ViewHolderNoImage( val binding: ItemPostNoimageBinding):BaseViewHolder<Athlete>(binding.root){
         private val viewModel = PostViewModel()
 
-        override fun bind(post:Athlete){
+        override fun bind(post:Athlete,listener: OnItemClickListener){
             viewModel.bind(post)
             binding.viewModel = viewModel
+            binding.rowLayout.setOnClickListener {
+                listener.onClick(it, post)
+            }
         }
     }
 }

@@ -75,7 +75,7 @@ fun setMutableImageFull(view: ImageView, url: MutableLiveData<String>?) {
 //        Log.i("here",str)
         url.observe(parentActivity, Observer { value ->
             if(value==null||value.equals("")){
-                view.visibility=View.INVISIBLE
+                view.visibility = View.INVISIBLE
             }
             else {
                 Glide.with(parentActivity)
